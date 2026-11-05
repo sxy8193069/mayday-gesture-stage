@@ -10,7 +10,7 @@ A browser-based, hand-controlled Mayday fan project, built with Three.js, MediaP
 
 ## 直接体验
 
-[打开在线体验](https://juncxio.github.io/mayday-gesture-stage/)
+[打开在线体验](https://sxy8193069.github.io/mayday-gesture-stage/)
 
 建议使用带摄像头的电脑和新版 Edge / Chrome。没有摄像头时，也可以先通过按钮体验完整场景。
 
@@ -103,4 +103,4 @@ npm test
 
 这是非官方粉丝作品，与五月天及其相关权利方没有官方隶属关系。代码许可证不授予乐队名称、商标、人物形象、音乐或演出影像等第三方内容的使用权。自行添加的素材应具有相应使用权限。
 
-作者：[麦提沈 / JunCxio](https://github.com/JunCxio)。遇到可复现的问题，欢迎提交 Issue，注明设备、浏览器、操作步骤与报错信息。
+作者：[麦提沈 / sxy8193069](https://github.com/sxy8193069)。遇到可复现的问题，欢迎提交 Issue，注明设备、浏览器、操作步骤与报错信息。
