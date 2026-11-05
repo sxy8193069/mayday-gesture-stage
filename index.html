@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#070c18">
+  <title>五月天 · 三维星空舞台</title>
+  <link rel="icon" href="data:,">
+  <style>
+    :root { color-scheme: dark; --ink: #eff4ff; --muted: #94a3bb; --line: #bcd5ff20; --mint: #a4e6d6; --blue: #b5cbff; }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #070c18; color: var(--ink); font-family: "Microsoft YaHei", "PingFang SC", sans-serif; -webkit-font-smoothing: antialiased; }
+    button, input, a { -webkit-tap-highlight-color: transparent; }
+    button { font: inherit; color: inherit; cursor: pointer; }
+    button:disabled { cursor: default; opacity: .45; }
+    button:focus-visible, a:focus-visible { outline: 2px solid var(--mint); outline-offset: 4px; }
+    button:hover:not(:disabled) { filter: brightness(1.15); }
+    [hidden] { display: none !important; }
+    .layout { max-width: 1800px; margin: auto; padding: 30px 42px 20px; }
+    header { display: flex; flex-wrap: wrap; align-items: center; gap: 22px; padding-bottom: 26px; border-bottom: 1px solid var(--line); }
+    .brand { display: flex; align-items: center; gap: 14px; font-size: 19px; font-weight: 600; letter-spacing: .1em; }
+    .brand-mark { display: flex; gap: 3px; }
+    .brand-mark i { display: block; width: 4px; height: 22px; border-radius: 1px; background: var(--c); transform: rotate(18deg); }
+    .brand-mark i:nth-child(2n) { margin-top: 5px; }
+    .view-switch { display: flex; gap: 4px; padding: 4px; margin-left: auto; background: #a7c4ff09; border: 1px solid var(--line); border-radius: 9px; }
+    .view-switch button { min-height: 44px; border: 0; background: transparent; padding: 8px 15px; border-radius: 5px; font-size: 12px; color: var(--muted); }
+    .view-switch button[aria-pressed="true"] { color: var(--ink); background: #bbd3ff14; }
+    .mode { display: flex; align-items: center; gap: 7px; font-size: 11px; color: var(--muted); }
+    .mode-dot { width: 5px; height: 5px; border-radius: 50%; background: #7591af; }
+    .mode[data-camera="true"] .mode-dot { background: var(--mint); box-shadow: 0 0 10px #a4e6d650; }
+    .experience-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 30px; padding-top: 25px; align-items:start; }
+    .scene-shell { position: relative; border: 1px solid var(--line); border-radius: 13px; overflow: hidden; min-width: 0; background: #080e1e; }
+    #garden { display: block; width: 100%; height: clamp(480px, calc(100svh - 215px), 820px); touch-action: pan-y; }
+    .scene-head { position: absolute; top: 24px; left: 26px; right: 26px; display: flex; align-items: center; justify-content: space-between; pointer-events: none; }
+    .scene-head span { font-size: 11px; letter-spacing: .17em; color: #a8b5cc; }
+    .scene-head strong { font: 20px Georgia, serif; color: #a4b5d5; font-weight: 400; letter-spacing: .08em; }
+    .scene-caption { position: absolute; left: 26px; right: 26px; bottom: 23px; display: flex; align-items: end; justify-content: space-between; gap: 18px; pointer-events: none; }
+    .scene-caption h1 { font-size: 19px; font-weight: 500; letter-spacing: .07em; margin: 0 0 8px; }
+    .scene-caption p { font-size: 11px; color: #9eabc1; margin: 0; line-height: 1.8; }
+    .scene-caption output { font: 15px Georgia, serif; color: #a8b5ce; white-space: nowrap; }
+    .sidebar { min-width: 0; }
+    .sidebar h2 { margin: 1px 0 10px; font-size: 22px; font-weight: 500; line-height: 1.6; letter-spacing: .06em; }
+    .sidebar > p { color: var(--muted); line-height: 1.9; font-size: 11px; margin: 0 0 22px; }
+    .member-rail { display: flex; justify-content: space-between; margin: 20px 0 24px; }
+    .member-rail span { display: flex; align-items: center; flex-direction: column; gap: 9px; font-size: 10px; color: #73839d; }
+    .member-rail i { height: 12px; width: 12px; border-radius: 50%; background: var(--c); opacity: .45; transition: opacity .2s, box-shadow .2s; }
+    .member-rail span[data-active="true"] { color: #dbe6fa; }
+    .member-rail span[data-active="true"] i { opacity: 1; box-shadow: 0 0 17px var(--c); }
+    .manual-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .manual-actions button, .camera-button, .record-actions button, #record-download { min-height: 44px; padding: 11px 12px; border: 1px solid #b5cbff32; background: #a3baff08; border-radius: 7px; font-size: 11px; transition: background .2s; }
+    #gather { background: #b8d0ff; color: #111d35; border-color: #b8d0ff; font-weight: 600; }
+    #stage-button, #celebrate { grid-column: 1 / -1; border-color: #e2cb743d; color: #e9d591; background: #e2cb7408; }
+    .reset-button { display: block; margin: 9px auto 16px; padding: 8px 14px; min-height: 44px; color: #8b9bb4; background: transparent; border: 0; font-size: 10px; }
+    .camera-panel { padding-top: 18px; border-top: 1px solid var(--line); }
+    .preview { position: relative; height: 152px; overflow: hidden; border-radius: 8px; border: 1px solid var(--line); background: #030812; margin-bottom: 11px; }
+    .preview video, .preview canvas { position: absolute; inset: 0; height: 100%; width: 100%; object-fit: cover; transform: scaleX(-1); }
+    .preview canvas { pointer-events: none; }
+    .preview-empty { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; flex-direction: column; gap: 10px; color: #637793; font-size: 11px; background: radial-gradient(ellipse, #101d32, #070f1d); }
+    .preview-empty svg { height: 24px; width: 24px; }
+    .preview[data-active="true"] .preview-empty { display: none; }
+    .hand-roles { display: flex; gap: 8px; margin-bottom: 12px; }
+    .hand-role { flex: 1; padding: 7px 5px; border: 1px solid var(--line); border-radius: 5px; font-size: 10px; text-align: center; color: #687c98; }
+    #switch-hand[data-tracked="true"] { color: #a4e6d6; border-color: #a4e6d63d; background: #a4e6d609; }
+    #bloom-hand[data-tracked="true"] { color: #f0bbd7; border-color: #f0bbd73d; background: #f0bbd709; }
+    .camera-button { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; color: #d6e3fa; }
+    .camera-button svg { width: 16px; height: 16px; }
+    #camera-status { color: #899bb7; font-size: 10px; line-height: 1.9; min-height: 38px; margin: 10px 0 0; }
+    #camera-status[data-error="true"], #record-status[data-error="true"] { color: #edb2a8; }
+    footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding-top: 19px; font-size: 9px; color: #5e718f; line-height: 1.9; }
+    .record-layout { display: none; gap: 35px; justify-content: center; align-items: start; padding-top: 25px; grid-template-columns: minmax(0, min(440px, calc((100svh - 170px) * .8))) 280px; }
+    body[data-view="recording"] .experience-layout { display: none; }
+    body[data-view="recording"] .record-layout { display: grid; }
+    .record-preview { min-width: 0; width: 100%; }
+    .record-heading { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 13px; align-items: center; }
+    .record-heading h2 { font-size: 12px; margin: 0; font-weight: 500; }
+    .record-heading span { color: var(--muted); font-size: 9px; }
+    .record-frame { position: relative; border: 1px solid #b5cbff25; border-radius: 8px; overflow: hidden; aspect-ratio: 4 / 5; background: #060d19; }
+    #record-stage { display: block; width: 100%; height: 100%; }
+    .record-empty { position: absolute; bottom: 12%; left: 10%; right: 10%; color: #a1afc5; text-align: center; font-size: 11px; pointer-events: none; }
+    .record-countdown { position: absolute; inset: 0; display: grid; place-items: center; font: 90px Georgia, serif; background: #0005; }
+    .record-caption { font-size: 10px; color: var(--muted); line-height: 1.9; text-align: center; }
+    .record-sidebar { min-width: 0; }
+    .record-card { border: 1px solid var(--line); padding: 18px; border-radius: 9px; background: #b8d0ff03; margin-bottom: 15px; }
+    .record-card h3 { margin: 0 0 15px; font-size: 13px; font-weight: 500; }
+    .record-card p { color: var(--muted); font-size: 10px; line-height: 1.9; margin: 12px 0 0; }
+    .record-card .camera-panel { padding: 0; border: 0; }
+    .record-card .preview { height: 130px; }
+    #record-camera-actions { margin-bottom: 13px; }
+    .record-clock { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 13px; }
+    #record-time { font: 26px Georgia, serif; }
+    #record-format { color: var(--muted); font-size: 9px; }
+    .record-actions { display: flex; gap: 9px; }
+    #record-start { flex: 1; background: #b8d0ff; color: #111d35; }
+    #record-playback { display: block; width: 100%; max-height: 260px; margin-bottom: 12px; }
+    #record-download { display: block; text-decoration: none; text-align: center; color: #d8e6ff; }
+    .record-controls { margin-bottom: 14px; }
+    .record-controls .manual-actions { gap: 6px; }
+    .record-controls button { font-size: 10px; padding: 9px; }
+    .record-controls .reset-button { margin-bottom: 0; }
+    @media (min-width: 1650px) { .layout { padding: 36px 54px 22px; } .experience-layout { grid-template-columns: minmax(0, 1fr) 300px; gap: 36px; } .preview { height: 165px; } }
+    @media (max-width: 1100px) { .layout { padding: 24px; } .experience-layout { grid-template-columns: minmax(0, 1fr) 240px; gap: 20px; } header { gap: 15px; } .brand { font-size: 16px; } .mode { font-size: 10px; } .preview { height: 135px; } .sidebar h2 { font-size: 20px; } .scene-caption h1 { font-size: 16px; } }
+    @media (max-width: 760px) {
+      .layout { padding: 20px 16px; } header { gap: 15px 10px; padding-bottom: 17px; } .brand { font-size: 15px; gap: 10px; } .brand-mark i { width: 3px; height: 17px; } .mode { margin-left: auto; font-size: 9px; } .view-switch { margin: 0; order: 3; width: 100%; } .view-switch button { flex: 1; min-height: 44px; }
+      .experience-layout { display: flex; flex-direction: column; padding-top: 17px; gap: 20px; } #garden { height: clamp(350px, 58svh, 570px); } .scene-head { top: 17px; left: 17px; right: 17px; } .scene-head strong { font-size: 17px; } .scene-head span { font-size: 9px; } .scene-caption { left: 17px; right: 17px; bottom: 16px; } .scene-caption h1 { font-size: 16px; } .scene-caption p { font-size: 10px; max-width: 250px; } .scene-caption output { font-size: 12px; }
+      .sidebar h2 { font-size: 18px; } .sidebar > p { font-size: 11px; margin-bottom: 15px; } .member-rail { margin: 15px 6px 20px; } .manual-actions button { min-height: 45px; font-size: 12px; } .camera-panel { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 10px 13px; align-items: start; } .preview { height: 112px; margin: 0; grid-row: 1 / 4; } .hand-roles { flex-direction: column; gap: 6px; margin: 0; } .hand-role { padding: 5px; } .camera-button { min-height: 44px; padding: 9px; } #camera-status { grid-column: 1 / -1; min-height: 0; margin: 0; }
+      .record-layout { grid-template-columns: minmax(0, 1fr); gap: 12px; padding-top: 20px; } .record-preview { max-width: 430px; margin: auto; } .record-card { padding: 16px; } .record-card .camera-panel { grid-template-columns: 150px minmax(0, 1fr); } .record-card .preview { height: 110px; } .record-card .hand-roles { grid-row: 1 / 3; grid-column: 2; } #record-camera-actions { margin-bottom: 12px; } .record-clock { margin-bottom: 12px; } footer { font-size: 9px; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+    .loading-screen{position:fixed;inset:0;z-index:10;display:grid;place-items:center;text-align:center;background:#070c18ed;padding:28px}.loading-screen strong{font-size:20px;font-weight:500}.loading-screen p{font-size:12px;color:#a4b5cc;line-height:1.9;max-width:430px}.loading-screen button{min-height:44px;border:1px solid #b5cbff50;background:#15243c;border-radius:7px;padding:10px 20px;margin-top:12px}
+    .scene-caption{position:static;padding:18px 22px 20px;border-top:1px solid #bcd5ff15;min-height:96px}.scene-caption h1{font-size:17px}.scene-caption p{line-height:1.8}.scene-head{top:17px;left:20px;right:20px}.scene-head strong{font-size:15px}#garden{height:auto;aspect-ratio:4/3}#motion-toggle{width:100%;min-height:44px;border:1px solid #b5cbff24;background:transparent;color:#aabbd5;border-radius:7px;font-size:11px;padding:10px;margin:0 0 16px}#motion-toggle[aria-pressed="true"]{border-color:#9bcbd165;color:#d7f3ef}
+    @media(max-width:760px){#garden{height:auto;aspect-ratio:4/3}.scene-caption{padding:16px;min-height:102px}.scene-caption h1{font-size:15px}.scene-caption p{font-size:10px;max-width:none}.scene-head span{font-size:9px}.scene-head strong{font-size:12px}.scene-caption output{font-size:11px}.record-controls #motion-toggle{margin-bottom:0}}
+  </style>
+</head>
+<body data-view="experience" data-ready="false">
+  <div class="loading-screen" id="scene-loading" role="status"><div><strong>星光正在就位</strong><p id="loading-message">正在加载三维舞台、五色表情球与粒子表面。</p></div></div>
+  <main class="layout">
+    <header>
+      <div class="brand"><span class="brand-mark" aria-hidden="true"><i style="--c:#ff493f"></i><i style="--c:#ffdc3e"></i><i style="--c:#ff74b8"></i><i style="--c:#27c7ed"></i><i style="--c:#3be270"></i></span><span>五月天 · 三维星空舞台</span></div>
+      <nav class="view-switch" aria-label="画面模式"><button id="experience-view" type="button" aria-pressed="true">星空体验</button><button id="recording-view" type="button" aria-pressed="false">竖屏录制 · 4:5</button></nav>
+      <div class="mode" id="mode"><span class="mode-dot"></span><span id="mode-label">自由体验</span></div>
+    </header>
+    <section class="experience-layout">
+      <div class="scene-shell">
+        <canvas id="garden" role="img" aria-label="五色星光散落的夜空"></canvas>
+        <div class="scene-head"><span id="scene-phase">01 / 五迷星空 LIVE</span><strong>5525</strong></div>
+        <div class="scene-caption"><div><h1 id="scene-title">把星光，握成一场相遇。</h1><p id="scene-hint">张开左手轻移，带起星光涟漪；握拳凝聚星球，右手 OK 点亮舞台。</p></div><output id="scene-count" aria-live="polite">00 / 05</output></div>
+      </div>
+      <aside class="sidebar" aria-label="互动操作">
+        <h2>五种颜色，<br>同一片星空。</h2>
+        <p>握住一颗星球，再把它交还夜空。<br>下一次握拳，遇见另一种颜色。</p>
+        <div class="member-rail" aria-label="五颗表情球"><span style="--c:#ff493f"><i></i>怪兽</span><span style="--c:#ffdc3e"><i></i>玛莎</span><span style="--c:#ff74b8"><i></i>阿信</span><span style="--c:#27c7ed"><i></i>冠佑</span><span style="--c:#3be270"><i></i>石头</span></div>
+        <div id="manual-home"><div id="manual-panel"><div class="manual-actions"><button id="gather" type="button">凝聚一颗星球</button><button id="scatter" type="button" disabled>散回星空</button><button id="stage-button" type="button">点亮 5525 舞台</button><button id="celebrate" type="button" disabled>再落一场彩带</button></div><button id="reset" class="reset-button" type="button">重新开始</button><button id="motion-toggle" type="button" aria-pressed="false">暂停动态效果</button></div></div>
+        <div id="camera-home"><div class="camera-panel" id="camera-panel">
+          <div class="preview" id="preview" data-active="false"><video id="camera" autoplay muted playsinline aria-label="本地摄像头预览"></video><canvas id="hand-overlay" aria-hidden="true"></canvas><div class="preview-empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><rect x="3" y="6" width="12" height="12" rx="2"/><path d="m15 10 6-3v10l-6-3"/></svg><span>让双手进入星空</span></div></div>
+          <div class="hand-roles" aria-label="双手识别状态"><span id="switch-hand" class="hand-role" data-tracked="false">左手 · 凝聚 / 散开</span><span id="bloom-hand" class="hand-role" data-tracked="false">右手 · OK 舞台 / 2 彩带</span></div>
+          <button class="camera-button" id="camera-toggle" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="6" width="12" height="12" rx="2"/><path d="m15 10 6-3v10l-6-3"/></svg><span id="camera-button-label">开启双手互动</span></button>
+          <p id="camera-status" role="status">可先用按钮体验。开启手势首次需要联网加载模型。</p>
+        </div></div>
+      </aside>
+    </section>
+    <section class="record-layout" aria-label="竖屏录制工作区">
+      <div class="record-preview"><div class="record-heading"><h2>你的星空现场</h2><span>1200 × 1500 · 30 帧</span></div><div class="record-frame"><canvas id="record-stage" width="1200" height="1500" role="img" aria-label="上方六成三维场景，下方四成人物和手势"></canvas><div class="record-empty" id="record-empty">开启摄像头，让你与星空同框</div><div class="record-countdown" id="record-countdown" role="status" hidden></div></div><p class="record-caption">上方 60% 星空与舞台 · 下方 40% 人物与手势<br>视频无声，可在剪映添加音乐。</p></div>
+      <aside class="record-sidebar" aria-label="录制操作">
+        <div class="record-card"><h3>双手入镜，准备开场</h3><div id="record-camera-home"></div><p>张开的左手轻移，带起星光涟漪；握拳聚合，张手散开。<br>球体出现后，轻移右手，眼神先看、身体随后转；停住片刻，收到各自的回应。<br>右手拇指与食指捏合成 OK，其余三指展开，点亮舞台。<br>舞台出现时自动落一次彩带；右手比 2 可再落一场，持续保持只触发一次。<br>舞台中轻移右手，带动蓝色应援与扫灯；左手先握拳，再张开散回星空。</p></div>
+        <div class="record-card record-controls"><h3>手动控制</h3><div id="record-manual-home"></div></div>
+        <div class="record-card"><h3>录下这场相遇</h3><div id="record-camera-actions"></div><div class="record-clock"><output id="record-time" aria-label="录制时长">00:00</output><span id="record-format">竖屏 · 无声</span></div><div class="record-actions"><button id="record-start" type="button" disabled>开始录制</button><button id="record-stop" type="button" hidden>停止</button></div><p id="record-status" role="status">先开启摄像头，再开始录制。</p><p>3 秒准备时间，点击停止结束录制。<br>仅在本机生成视频，不采集麦克风。</p></div>
+        <div class="record-card" id="record-result" hidden><h3>本次成片</h3><video id="record-playback" controls playsinline preload="metadata" aria-label="已录制视频预览"></video><a id="record-download">下载视频</a><p id="record-result-info"></p></div>
+      </aside>
+    </section>
+    <footer><span>画面与手势在浏览器本地处理，主动录制后可下载。</span><span>五色星光 · 五月天 5525</span></footer>
+  </main>
+  <noscript><p>请在浏览器设置中开启 JavaScript。</p></noscript>
+  <script src="./vendor/mp4-muxer.js"></script>
+<script src="./src/core.js"></script>
+<script src="./src/motion.js"></script>
+<script type="module" src="./src/boot.mjs"></script>
+</body>
+</html>
